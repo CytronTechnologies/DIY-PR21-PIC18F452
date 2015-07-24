@@ -1,9 +1,12 @@
 //===========================================================================================
 //	Author				:CYTRON	TECHNOLOGIES
 //	Project				:DIY Project(PR21-Gaming with Accerlerometer)
-//	Project description	:Use PIC18F452 microcontroller together with the ADXL330 
-//						 accelerometer to measure the gravity force and DS-LCD-TG12864B-03 
-//                       Graphical LCD (GLCD) for display.
+//	Project description             :Use PIC18F452 microcontroller together with the ADXL330
+//                                      accelerometer to measure the gravity force and DS-LCD-TG12864B-03
+//                                      Graphical LCD (GLCD) for display.
+//                                      This project use PIC18F452.Competible with MPLAB and MPLABX
+//                                      Compiler only with Microchip C18.
+//                                      This project modify the program provided by Microchip Technology, Inc.
 //===========================================================================================
 
 
@@ -21,30 +24,30 @@
 #pragma config BOR = OFF
 #pragma config WDT = OFF
 #pragma config CCP2MUX = OFF
-#pragma config LVP = OFF						//configuration for the  microcontroller
+#pragma config LVP = OFF			//configuration for the  microcontroller
 	
 //===========================================================================================					
 //	Define
 //============================================================================================
-#define	lcd_data	LATD						//LCD 8-bit data PORT
-#define	rst			LATCbits.LATC4
-#define	rs			LATCbits.LATC5				//RS pin of the LCD display
-#define	rw			LATCbits.LATC6				//R/W pin of the LCD display	
-#define	e			LATCbits.LATC7				//E pin of the LCD display
-#define psb			LATCbits.LATC3
-#define	b_light		LATCbits.LATC2				//backlight of the LCD display (1 to on backlight)
+#define	lcd_data	LATD			//LCD 8-bit data PORT
+#define	RST		LATCbits.LATC4
+#define	RS		LATCbits.LATC5		//RS pin of the LCD display
+#define	RW		LATCbits.LATC6		//R/W pin of the LCD display
+#define	E		LATCbits.LATC7		//E pin of the LCD display
+#define PSB		LATCbits.LATC3
+#define	b_light		LATCbits.LATC2		//backlight of the LCD display (1 to on backlight)
 
-#define	buzzer		LATCbits.LATC0				//buzzer (1 to on buzzer)
-#define	sw1			PORTBbits.RB0				//button (active low)
-#define	sw2			PORTBbits.RB1				//button (active low)
+#define	BUZZER		LATCbits.LATC0		//buzzer (1 to on buzzer)
+#define	SW1		PORTBbits.RB0		//button (active low)
+#define	SW2		PORTBbits.RB1		//button (active low)
 #define z_axis 		PORTAbits.RA0
 #define y_axis 		PORTAbits.RA1
 #define	x_axis		PORTAbits.RA2				
 #define preset		PORTAbits.RA4
-#define st 			LATBbits.LATB2
-#define	channel0  	0b10000001					// Configuration for read ADC channel 0 (RA0)
-#define	channel1 	0b10001001					// Configuration for read ADC channel 1 (RA1)
-#define	channel2	0b10010001					// Configuration for read ADC channel 2 (RA2)
+#define st 		LATBbits.LATB2
+#define	channel0  	0b10000001		// Configuration for read ADC channel 0 (RA0)
+#define	channel1 	0b10001001		// Configuration for read ADC channel 1 (RA1)
+#define	channel2	0b10010001		// Configuration for read ADC channel 2 (RA2)
 
 
 
@@ -275,21 +278,21 @@ rom char graphic[3][1024] = {{
 rom char icon [8] = { 0x00,0x18,0x3C,0x7E,0x7E,0x3C,0x18,0x00};
 
 //=====================================================================================
-//	function prototype				(every function must have a function prototype)
+//	function prototype		(every function must have a function prototype)
 //=====================================================================================
 void init(void);
 void delay(unsigned long data);			
-void send_config(unsigned char data);
+void send_config(unsigned char data);           //send lcd configuration
 void lcd_read(char x, char y);
-void send_char(unsigned char data);
-void lcd_goto(unsigned char data);
-void lcd_clr(void);
-void send_string(const char *s);
+void send_char(unsigned char data);             //send lcd character
+void lcd_goto(unsigned char data);              //set the location of the lcd cursor
+void lcd_clr(void);                             //clear the lcd
+void send_string(const char *s);                //send a string to display in the lcd
 
-void lcd_xy(unsigned char x,unsigned char y);
+void lcd_xy(unsigned char x,unsigned char y);   //set the xy position for graphic
 void d_graphic(char k);
 void clr_graphic(void);
-void d_icon(int x,int y);	
+void d_icon(int x,int y);                       //display first bit of 8x8 icon at x,y position
 void freespace(void);
 void friction(void);
 void box(void);
@@ -310,92 +313,92 @@ void main(void)
 	unsigned int m,j;
 
 	init();
-	d_graphic(0);									//display cytron logo
-	delay(300000);									//delay for pic display
+	d_graphic(0);					//display cytron logo
+	delay(300000);					//delay for pic display
 
 	// display claibrating messages
-	send_config(0b00110000);						//set to function set configuration
-	lcd_clr();										//clear the lcd
-	send_string(cali);								//display string
-	lcd_goto (8);									//cursor at 3rd character line
-	send_string(mssg1);								//display string mssg1
-	lcd_goto(24);									//cursor at 4th  character line
-	send_string(mssg2);								//display string mssg2
+	send_config(0b00110000);			//set to function set configuration
+	lcd_clr();					//clear the lcd
+	send_string(cali);				//display string
+	lcd_goto (8);					//cursor at 3rd character line
+	send_string(mssg1);				//display string mssg1
+	lcd_goto(24);					//cursor at 4th  character line
+	send_string(mssg2);				//display string mssg2
 
-	while(sw1);										//wait for button pushed
-	while(!sw1);									//wait for button release
-	calibrate();									//taking the current force as reference for flat plane
-	lcd_clr();										//clear the lcd
+	while(SW1);					//wait for button pushed
+	while(!SW1);					//wait for button release
+	calibrate();					//taking the current force as reference for flat plane
+	lcd_clr();					//clear the lcd
 	
 
-	lcd_goto(1);									//cursor at 3rd character, 1st character line
-	send_string(mssg3);								//display string mssg3
-	lcd_goto(17);									//cursor at 3rd character, 2st character line
-	send_string(mssg4);								//display string mssg4
-	lcd_goto(0);									//cursor at 1st character, 1st character line
-	send_char(0x10);								//display symbol arrow
-	m =0 ;											//set the variable 0
+	lcd_goto(1);					//cursor at 3rd character, 1st character line
+	send_string(mssg3);				//display string mssg3
+	lcd_goto(17);					//cursor at 3rd character, 2st character line
+	send_string(mssg4);				//display string mssg4
+	lcd_goto(0);					//cursor at 1st character, 1st character line
+	send_char(0x10);				//display symbol arrow
+	m =0 ;						//set the variable 0
 
-	while(1)										//loop forever
+	while(1)					//loop forever
 	{
 
-		if (!sw1)									//if sw1 is pressed, increase mode
+		if (!SW1)				//if sw1 is pressed, increase mode
 		{
-			while(!sw1);							//wait until sw1 is release
-			m++;									//increament m
-			if (m>1) m=0;							//if m more than 1 , clear m
+			while(!SW1);			//wait until sw1 is release
+			m++;				//increament m
+			if (m>1) m=0;			//if m more than 1 , clear m
 
-			if (m==1) 								//if m is 1
+			if (m==1) 			//if m is 1
 			{
-				lcd_goto(0);						//cursor at 1st line
-				send_char('  ');					//space 1st and 2nd character , 1st line
-				lcd_goto(16);						//cursor at 2nd line
-				send_char(0x10);					//display arrow at 2nd charater, 2nd line
+				lcd_goto(0);		//cursor at 1st line
+				send_char('  ');	//space 1st and 2nd character , 1st line
+				lcd_goto(16);		//cursor at 2nd line
+				send_char(0x10);	//display arrow at 2nd charater, 2nd line
 			}
 			else 
 			{
-				lcd_goto(0);						//cursor at 1st line
-				send_char(0x10);					//display arrow at 2nd charater, 1st line
-				lcd_goto(16);						//cursor at 2nd line
-				send_char('  ');					//space 1st and 2nd character , 2nd line
+				lcd_goto(0);		//cursor at 1st line
+				send_char(0x10);	//display arrow at 2nd charater, 1st line
+				lcd_goto(16);		//cursor at 2nd line
+				send_char('  ');	//space 1st and 2nd character , 2nd line
 			}
 		}
 
-		else if (!sw2)								//if sw is pressed
+		else if (!SW2)					//if sw is pressed
 		{
-			while(!sw2);							//wait until sw2 is released
-			lcd_clr();								//clear all character
-			clr_graphic();							//clear all graphic
+			while(!SW2);				//wait until sw2 is released
+			lcd_clr();				//clear all character
+			clr_graphic();				//clear all graphic
 
 			// 16 bit timer initial status and start timer
-			TMR0H = 194;							// value for timer reach overflow in 50 ms for clock 10MIPS		
+			TMR0H = 194;						// value for timer reach overflow in 50 ms for clock 10MIPS		
 			TMR0L = 246;
 			T0CONbits.TMR0ON = 1;					//start timer
 
-			while(1)								//loop forever
+			while(1)						//loop forever
 			{
 				if (INTCONbits.TMR0IF==1)			//if timer over flow ( occur every 50 ms) // to update data every 50 ms
 				{
 					INTCONbits.TMR0IF==0;			//clear the flag bit
-					TMR0H=194;						//value for timer reach overflow in 50 ms for clock 10MIPS		
+					TMR0H=194;				//value for timer reach overflow in 50 ms for clock 10MIPS		
 					TMR0L=246;
 					if (m==1) friction();			//if mode is 1 , the do calculation friction, else do calculation freespace.
 					else 	freespace();			//update the data ( required for more accurate intergration ( faster, more accurate )) 
 
-					i++;							//increment variable i
+					i++;					//increment variable i
 				}
 					
-				if (i==10) 							//if i reach ten ( around 500 ms) update the icon position
+				if (i==10) 					//if i reach ten ( around 500 ms) update the icon position
 				{
 					if((x_dis/sens >60)||(x_dis/sens<-60)||(y_dis/sens>28)||(y_dis/sens<-28))	//if the icon position not in range of glcd
 					{																					//mean 'the ball drop out from glcd'
-						d_graphic(1);				//display graphic 
-						delay(300000);				//dealy for display the graphic
-						d_graphic(2);				//display another graphic
+						d_graphic(1);			//display graphic 
+						delay(300000);			//dealy for display the graphic
+						d_graphic(2);			//display another graphic
 						delay(300000);				
 			 			while(1);
 					}
-					d_icon(60-(x_dis/sens),28+(y_dis/sens));				//display icon at updated x,y position
+					d_icon(60-(x_dis/sens),28+(y_dis/sens));		//display icon at updated x,y position
 					i=0;							//clear the variable i
 				}
 			}
@@ -410,65 +413,65 @@ void main(void)
 void init()
 {
 	//set I/O input output
-	TRISD = 0b00000000;					//configure PORTB I/O direction
-	TRISC = 0b00000000;					//configure PORTC I/O direction
+	TRISD = 0b00000000;			//configure PORTB I/O direction
+	TRISC = 0b00000000;			//configure PORTC I/O direction
 	TRISB = 0b00000011;
-	TRISA = 0b00111111;					//configure PORTA I/O direction
+	TRISA = 0b00111111;			//configure PORTA I/O direction
 	
 	// ADC configuration	
-	ADCON1 = 0b11000011;				//set all portA as Analog Input, right justified	
+	ADCON1 = 0b11000011;			//set all portA as Analog Input, right justified	
 
 	//Timer 0 configuration
-	T0CON = 0b00000100;					//prescale 1: 32
+	T0CON = 0b00000100;			//prescale 1: 32
 
 
-	// setup for pwm					//For controlling back light
+	// setup for pwm			//For controlling back light
 	PR2 = 255;
-	T2CON =  	0b00000100;				//prescale 1:
-	CCP1CON =	0b00001100;				//Configuration for pwm
+	T2CON =  	0b00000100;		//prescale 1:
+	CCP1CON =	0b00001100;		//Configuration for pwm
 	CCP2CON =	0b00001100;
 
 	//configure lcd
-	rst = 0;
-	rst = 1;
+	RST = 0;
+	RST = 1;
 	delay (100000);						
-	psb  = 1;
+	PSB  = 1;
 
 	//basic instruction config
-	send_config(0b00110000);			//function set
-	lcd_clr();							//clear display at lcd
-	send_config(0b00000010);			//lcd return to home 
-	send_config(0b00000110);			//entry mode-cursor increase 1
-	send_config(0b00001100);			//display on, cursor off and cursor blink off
+	send_config(0b00110000);            //function set
+	lcd_clr();                          //clear display at lcd
+	send_config(0b00000010);            //lcd return to home
+	send_config(0b00000110);            //entry mode-cursor increase 1
+	send_config(0b00001100);            //display on, cursor off and cursor blink off
 
 	//set initial condition
-	send_config(0b00110100);			//extended function set
+	send_config(0b00110100);            //extended function set
 	send_config(0b00000010);
 	send_config(0b00000100);
-	send_config(0b00110000);			//function set
+	send_config(0b00110000);            //function set
 	
-	lcd_clr();							//clear lcd
-	CCPR1L = 50;						//set the brightness of the back lcd
+	lcd_clr();		//clear lcd
+	CCPR1L = 50;		//set the brightness of the back lcd
 
 }
 
 
 //	functions
 //===============================================================================================================================
-void beep(void)							//short beep function
+void beep(void)				//short beep function
 {
-	buzzer=1;							//on buzzer
-	delay(10000);						//short delay
-	buzzer=0;							//off buzzer
-	delay(10000);						//short delay
+	BUZZER=1;			//on buzzer
+	delay(10000);			//short delay
+	BUZZER=0;			//off buzzer
+	delay(10000);			//short delay
 }
 
 //calculation for freespace 
 //===============================================================================================================================
 void freespace(void)					
 {
-	xaxis=read_adc(channel0);							//read the force acting on x axis
-	yaxis=read_adc(channel1);							//reat the force acting on y axis
+	xaxis=read_adc(channel0);	//read the force acting on x axis
+	yaxis=read_adc(channel1);	//reat the force acting on y axis
 
 	xaxis-=x_off;										//offset with value obtain before game start
 	yaxis-=y_off;										//offset with value obtain before game start
@@ -487,26 +490,26 @@ void freespace(void)
 //===============================================================================================================================
 void friction(void)
 {
-	xaxis=read_adc(channel0);							//read the force acting on x axis
-	yaxis=read_adc(channel1);							//reat the force acting on y axis
+	xaxis=read_adc(channel0);	//read the force acting on x axis
+	yaxis=read_adc(channel1);	//reat the force acting on y axis
 
-	xaxis-=x_off;										//offset with value obtain before game start
-	yaxis-=y_off;										//offset with value obtain before game start
+	xaxis-=x_off;				//offset with value obtain before game start
+	yaxis-=y_off;				//offset with value obtain before game start
 
-	if (((last_x-xaxis)==1)||((xaxis-last_x)==1)) xaxis=0;		//filter noise
-	if (((last_y-yaxis)==1)||((last_y-yaxis)==-1)) yaxis=0;		//filter noise
+	if (((last_x-xaxis)==1)||((xaxis-last_x)==1)) xaxis=0;	//filter noise
+	if (((last_y-yaxis)==1)||((last_y-yaxis)==-1)) yaxis=0;	//filter noise
 
-	x_velo+=xaxis/2;									//intergrate the force resultance velocity
-	y_velo+=yaxis/2;									//intergrate the force resultance velocity
+	x_velo+=xaxis/2;			//intergrate the force resultance velocity
+	y_velo+=yaxis/2;                        //intergrate the force resultance velocity
 
-	if(x_velo>0) x_velo--;								//decreace the velocity ( making like having friction force )
+	if(x_velo>0) x_velo--;                  //decreace the velocity ( making like having friction force )
 	else if (x_velo<0) x_velo++;
 	
 	if(y_velo>0) y_velo--;
 	else if (y_velo<0) y_velo++;
 
-	x_dis += x_velo;									//intergrate the velocity resultance distance
-	y_dis += y_velo;									//intergrate the velocity resultance distance
+	x_dis += x_velo;			//intergrate the velocity resultance distance
+	y_dis += y_velo;                        //intergrate the velocity resultance distance
 }
 
 // ADC function
@@ -517,27 +520,27 @@ unsigned int read_adc(char config)
 	unsigned long result ,result_temp=0;
 
 	ADCON0 = config;
-	delay(1000);										// delay after changing configuration 
-	for(i=20;i>0;i-=1)									//looping 200 times for getting average value 
+	delay(1000);					// delay after changing configuration 
+	for(i=20;i>0;i-=1)				//looping 200 times for getting average value 
 	{
-		ADCON0bits.GO = 1;								//ADGO is the bit 2 of the ADCON0 register
-		while(ADCON0bits.GO==1);						//ADC start, ADGO=0 after finish ADC progress
+		ADCON0bits.GO = 1;			//ADGO is the bit 2 of the ADCON0 register
+		while(ADCON0bits.GO==1);		//ADC start, ADGO=0 after finish ADC progress
 		result=ADRESH;
-		result=result<<8;								//shift to left for 8 bit
-		result=result|ADRESL;							//10 bit result from ADC
+		result=result<<8;			//shift to left for 8 bit
+		result=result|ADRESL;			//10 bit result from ADC
 
 		result_temp+=result;		
 	}
-	result = result_temp/20;							//getting average value
-	ADCON0bits.ADON = 0;								//adc module is shut off
+	result = result_temp/20;			//getting average value
+	ADCON0bits.ADON = 0;				//adc module is shut off
 	return result;
 }
 
 void calibrate(void)
 {
-		x_off = read_adc(channel0);						//read x_axis accelero value and save as offset
-		y_off = read_adc(channel1);						//read x_axis accelero value and save as offset
-		z_off = read_adc(channel2);						//read x_axis accelero value and save as offset
+		x_off = read_adc(channel0);		//read x_axis accelero value and save as offset
+		y_off = read_adc(channel1);		//read x_axis accelero value and save as offset
+		z_off = read_adc(channel2);		//read x_axis accelero value and save as offset
 }
 
 
@@ -545,30 +548,30 @@ void calibrate(void)
 // LCD function 
 // Config function
 //===============================================================================================================================
-void delay(unsigned long data)							//delay function, the delay time
-{														//depend on the given value
+void delay(unsigned long data)			//delay function, the delay time
+{						//depend on the given value
 	for( ;data>0;data-=1);	
 }
 
-void send_config(unsigned char data)					//send lcd configuration 
+void send_config(unsigned char data)		//send lcd configuration 
 {
-	rw=0;												//set lcd to write mode
-	rs=0;												//set lcd to configuration mode
-	lcd_data=data;										//lcd data port = data
-	e=1;												//pulse e to confirm the data
+	RW=0;					//set lcd to write mode
+	RS=0;					//set lcd to configuration mode
+	lcd_data=data;				//lcd data port = data
+	E=1;					//pulse e to confirm the data
 	delay(20);
-	e=0;
+	E=0;
 	delay(20);
 }
 
-void send_char(unsigned char data)						//send lcd character
+void send_char(unsigned char data)		//send lcd character
 {
- 	rw=0;												//set lcd to write mode
-	rs=1;												//set lcd to display mode
-	lcd_data=data;										//lcd data port = data
-	e=1;												//pulse e to confirm the data
+ 	RW=0;					//set lcd to write mode
+	RS=1;					//set lcd to display mode
+	lcd_data=data;				//lcd data port = data
+	E=1;					//pulse e to confirm the data
 	delay(20);		
-	e=0;
+	E=0;
 	delay(20);
 }
 
@@ -576,24 +579,24 @@ void send_char(unsigned char data)						//send lcd character
 // char function (make sure is in basic function before use lcd function)
 //===============================================================================================================================
 
-void lcd_goto(unsigned char data)						//set the location of the lcd cursor
+void lcd_goto(unsigned char data)				//set the location of the lcd cursor
 {										
 	 	send_config(0x80+data);		
 // -----------------------------------------------------
-// | |00|01|02|03|04|05|06|07| | 						//1 location can store 2 character
+// | |00|01|02|03|04|05|06|07| | 				//1 location can store 2 character
 // | |17|18|19|...........|15| |
 // | |09|10|11|...........|23| |
 // | |24|.................|31| |
 // -----------------------------------------------------	
 }
 
-void lcd_clr(void)										//clear the lcd
+void lcd_clr(void)						//clear the lcd
 {	
  	send_config(0x01);
 	delay(600);	
 }
 
-void send_string(const char *s)							//send a string to display in the lcd
+void send_string(const char *s)					//send a string to display in the lcd
 {          
 	unsigned char i=0;
   	while (s && *s)send_char (*s++);
@@ -601,7 +604,7 @@ void send_string(const char *s)							//send a string to display in the lcd
 
 
 
-void function( char data)								//1 for extention , 0 for basic  * must off graphic before go back basic function
+void function( char data)					//1 for extention , 0 for basic  * must off graphic before go back basic function
 {
 	send_config(0x30 |data << 2);
 }
@@ -636,17 +639,17 @@ void function( char data)								//1 for extention , 0 for basic  * must off gra
 
 
 // display an icon at position x,y
-void d_icon(int x,int y)								//display first bit of 8x8 icon at x,y position 
+void d_icon(int x,int y)                            //display first bit of 8x8 icon at x,y position
 {
 	char i,j;
 
-	if (p_x%16 <8)										//if x position is on upper byte of 16 bit
+	if (p_x%16 <8)                              //if x position is on upper byte of 16 bit
 	{
-		for (j=0;j<8;j++)								//repeat for 8 vertical line
+		for (j=0;j<8;j++)			//repeat for 8 vertical line
 		{
-			lcd_xy(p_x/16,(p_y+j)%64);					//go to the location and y is re-adjust after adding j ( > 64 after adding j )
-			send_char(0);								//send upperbyte with shifting according to the x position 
-			send_char(0);								//send lowerbyte with shifting according to the x position 
+			lcd_xy(p_x/16,(p_y+j)%64);	//go to the location and y is re-adjust after adding j ( > 64 after adding j )
+			send_char(0);			//send upperbyte with shifting according to the x position 
+			send_char(0);			//send lowerbyte with shifting according to the x position 
 		}
 	}
 
@@ -654,23 +657,23 @@ void d_icon(int x,int y)								//display first bit of 8x8 icon at x,y position
 	{
 		for (j=0;j<8;j++)
 		{
-			lcd_xy(p_x/16,(p_y+j)%64);					//go to the location and y is re-adjust after adding j ( > 64 after adding j )
-			send_char (0);								//send dummy data to the upperbyte
-			send_char(0);								//send lowerbyte data with shifting according to the x position 
+			lcd_xy(p_x/16,(p_y+j)%64);		//go to the location and y is re-adjust after adding j ( > 64 after adding j )
+			send_char (0);				//send dummy data to the upperbyte
+			send_char(0);				//send lowerbyte data with shifting according to the x position 
 			if(p_x/16 == 7) lcd_xy(0,p_y+j);
-			send_char(0);								//send upperbyte of the next 'x' with shifting according to the x position 
+			send_char(0);				//send upperbyte of the next 'x' with shifting according to the x position 
 		}
 	}
 
 
 
-	if (x%16 <8)										//if x position is on upper byte of 16 bit
+	if (x%16 <8)							//if x position is on upper byte of 16 bit
 	{
-		for (j=0;j<8;j++)								//repeat for 8 vertical line
+		for (j=0;j<8;j++)					//repeat for 8 vertical line
 		{
-			lcd_xy(x/16,(y+j)%64);						//go to the location and y is re-adjust after adding j ( > 64 after adding j )
-			send_char(icon[j]>> x%8);					//send upperbyte with shifting according to the x position 
-			send_char(icon[j]<< (8-x%8));				//send lowerbyte with shifting according to the x position 
+			lcd_xy(x/16,(y+j)%64);				//go to the location and y is re-adjust after adding j ( > 64 after adding j )
+			send_char(icon[j]>> x%8);			//send upperbyte with shifting according to the x position 
+			send_char(icon[j]<< (8-x%8));			//send lowerbyte with shifting according to the x position 
 		}
 	}
 
@@ -678,15 +681,15 @@ void d_icon(int x,int y)								//display first bit of 8x8 icon at x,y position
 	{
 		for (j=0;j<8;j++)
 		{
-			lcd_xy(x/16,(y+j)%64);						//go to the location and y is re-adjust after adding j ( > 64 after adding j )
-			send_char (0);								//send dummy data to the upperbyte
-			send_char(icon[j]>> x%8);					//send lowerbyte data with shifting according to the x position 
+			lcd_xy(x/16,(y+j)%64);			//go to the location and y is re-adjust after adding j ( > 64 after adding j )
+			send_char (0);				//send dummy data to the upperbyte
+			send_char(icon[j]>> x%8);		//send lowerbyte data with shifting according to the x position 
 			if(x/16 == 7) lcd_xy(0,y+j);
-			send_char(icon[j]<< (8-x%8));				//send upperbyte of the next 'x' with shifting according to the x position 
+			send_char(icon[j]<< (8-x%8));		//send upperbyte of the next 'x' with shifting according to the x position 
 		}	
 	}
-	p_x = x;											//save as previous location
-	p_y= y;												//save as previous location
+	p_x = x;						//save as previous location
+	p_y= y;							//save as previous location
 
 }
 
@@ -694,15 +697,15 @@ void d_icon(int x,int y)								//display first bit of 8x8 icon at x,y position
 void lcd_xy(unsigned char x,unsigned char y)			//set the xy position for graphic
 {
 		if( y >= 32)
-		{												//if vertical more or equal 32
-			send_config(0x80+y-32);						//adjust the vertical line
-			send_config(0x80+x+8);						//for more detail refer GDRAM in user manual
+		{                                               //if vertical more or equal 32
+			send_config(0x80+y-32);			//adjust the vertical line
+			send_config(0x80+x+8);			//for more detail refer GDRAM in user manual
 		}
 
 		else
 		{
-		 	send_config(0x80+y);						//vertical (Y) max 63
-			send_config(0x80+x);						//horizontal (X) max 8 (horizontal is divided by 16 bit data (represented in 2 bytes))
+		 	send_config(0x80+y);			//vertical (Y) max 63
+			send_config(0x80+x);			//horizontal (X) max 8 (horizontal is divided by 16 bit data (represented in 2 bytes))
 		}
 }
 
@@ -712,20 +715,20 @@ void lcd_xy(unsigned char x,unsigned char y)			//set the xy position for graphic
 void d_graphic(char k)
 {
 	unsigned int i,j,y;
-	send_config(0b00111100);										//set to extention mode nad graphic off
+	send_config(0b00111100);		//set to extention mode nad graphic off
 
-	y = 0b10000000;													//set y as vertical configuration
+	y = 0b10000000;				//set y as vertical configuration
 
-	for(j = 0; j <32 ; j++)											//32 line 
+	for(j = 0; j <32 ; j++)			//32 line 
 	{
-		send_config(y++);											//increase line
-		send_config(0b10000000);									//set add back to 0
-		for(i=0;i<16;i++)send_char(graphic[k][i+j*16]);				//display first half
+		send_config(y++);						//increase line
+		send_config(0b10000000);					//set add back to 0
+		for(i=0;i<16;i++)send_char(graphic[k][i+j*16]);			//display first half
 
-		for(i=0;i<16;i++)send_char(graphic[k][i+512+j*16]);			//display second half **since the x add is increased more than 7. See CGRAM map above or refer user manual for CGRAM map for more detail.
+		for(i=0;i<16;i++)send_char(graphic[k][i+512+j*16]);		//display second half **since the x add is increased more than 7. See CGRAM map above or refer user manual for CGRAM map for more detail.
 	}
 
-	send_config(0b00111110);										//set to extention mode and graphic on
+	send_config(0b00111110);						//set to extention mode and graphic on
 }
 
 // clear all the graphic
@@ -733,14 +736,14 @@ void d_graphic(char k)
 void clr_graphic()
 {
 	unsigned int i,j,y;
-	send_config (0b00111100);										//set to extention mode and graphic off
+	send_config (0b00111100);			//set to extention mode and graphic off
 
-	y = 0b10000000;													//set y as vertical configuration
-	for(j = 0; j <32 ; j++)											//32 line 
+	y = 0b10000000;					//set y as vertical configuration
+	for(j = 0; j <32 ; j++)				//32 line 
 	{
-		send_config(y++);											//increase line
-		send_config(0b10000000);									//set add back to 0
-		for(i=0;i<32;i++)send_char(0);								//clear all
+		send_config(y++);                       //increase line
+		send_config(0b10000000);		//set add back to 0
+		for(i=0;i<32;i++)send_char(0);		//clear all
 	}
-	send_config(0b00111110);										//set to extention mode and graphic on
+	send_config(0b00111110);			//set to extention mode and graphic on
 }
